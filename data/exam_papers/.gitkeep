@@ -1,0 +1,3 @@
+# Placeholder — full dataset (1,350 questions) to be added via full migration.
+# Run: ./docs/service-migrations/migrate-exam-papers.sh (from a local machine
+# with data/exam_papers/ and mlops/exam_paper_scraper.py present)
