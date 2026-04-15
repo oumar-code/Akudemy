@@ -1,0 +1,559 @@
+components:
+  schemas:
+    ContentCreate:
+      properties:
+        asset_url:
+          format: uri
+          maxLength: 2083
+          minLength: 1
+          title: Asset Url
+          type: string
+        content_type:
+          $ref: '#/components/schemas/ContentType'
+        description:
+          anyOf:
+          - maxLength: 2048
+            type: string
+          - type: 'null'
+          title: Description
+        language_code:
+          default: en
+          pattern: ^[a-z]{2}(-[A-Z]{2})?$
+          title: Language Code
+          type: string
+        lesson_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Lesson Id
+        offline_available:
+          default: true
+          title: Offline Available
+          type: boolean
+        size_bytes:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Size Bytes
+        tags:
+          items:
+            type: string
+          title: Tags
+          type: array
+        title:
+          maxLength: 512
+          minLength: 1
+          title: Title
+          type: string
+      required:
+      - title
+      - content_type
+      - asset_url
+      title: ContentCreate
+      type: object
+    ContentRead:
+      properties:
+        asset_url:
+          title: Asset Url
+          type: string
+        content_type:
+          $ref: '#/components/schemas/ContentType'
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        description:
+          anyOf:
+          - maxLength: 2048
+            type: string
+          - type: 'null'
+          title: Description
+        id:
+          format: uuid
+          title: Id
+          type: string
+        language_code:
+          default: en
+          pattern: ^[a-z]{2}(-[A-Z]{2})?$
+          title: Language Code
+          type: string
+        lesson_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Lesson Id
+        offline_available:
+          default: true
+          title: Offline Available
+          type: boolean
+        size_bytes:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Size Bytes
+        tags:
+          items:
+            type: string
+          title: Tags
+          type: array
+        title:
+          maxLength: 512
+          minLength: 1
+          title: Title
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - title
+      - content_type
+      - id
+      - lesson_id
+      - asset_url
+      - created_at
+      - updated_at
+      title: ContentRead
+      type: object
+    ContentSyncResponse:
+      description: Envelope returned by the offline-sync endpoint.
+      properties:
+        count:
+          title: Count
+          type: integer
+        items:
+          items:
+            $ref: '#/components/schemas/ContentRead'
+          title: Items
+          type: array
+        next_sync_token:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Opaque cursor for the next sync window.
+          title: Next Sync Token
+        since:
+          format: date-time
+          title: Since
+          type: string
+      required:
+      - since
+      - count
+      - items
+      title: ContentSyncResponse
+      type: object
+    ContentType:
+      enum:
+      - video
+      - document
+      - quiz
+      - interactive
+      title: ContentType
+      type: string
+    CredentialIssueRequest:
+      properties:
+        course_id:
+          format: uuid
+          title: Course Id
+          type: string
+        credential_type:
+          $ref: '#/components/schemas/CredentialType'
+        issued_at:
+          format: date-time
+          title: Issued At
+          type: string
+        learner_id:
+          format: uuid
+          title: Learner Id
+          type: string
+        learner_wallet_address:
+          description: "Polygon-compatible EOA or contract address (0x\u2026)."
+          pattern: ^0x[0-9a-fA-F]{40}$
+          title: Learner Wallet Address
+          type: string
+        lesson_ids:
+          description: Specific lessons covered by this credential.
+          items:
+            format: uuid
+            type: string
+          title: Lesson Ids
+          type: array
+        metadata:
+          additionalProperties:
+            type: string
+          description: Arbitrary key-value pairs embedded in the on-chain token URI.
+          title: Metadata
+          type: object
+      required:
+      - learner_id
+      - learner_wallet_address
+      - credential_type
+      - course_id
+      title: CredentialIssueRequest
+      type: object
+    CredentialIssueResponse:
+      description: Result returned immediately after submitting the issuance transaction.
+      properties:
+        credential_id:
+          format: uuid
+          title: Credential Id
+          type: string
+        issued_at:
+          format: date-time
+          title: Issued At
+          type: string
+        polygon_explorer_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: PolygonScan URL for the transaction.
+          title: Polygon Explorer Url
+        status:
+          $ref: '#/components/schemas/CredentialStatus'
+          default: pending
+        tx_hash:
+          description: "Polygon transaction hash (0x\u2026)."
+          title: Tx Hash
+          type: string
+      required:
+      - credential_id
+      - tx_hash
+      - issued_at
+      title: CredentialIssueResponse
+      type: object
+    CredentialStatus:
+      enum:
+      - pending
+      - issued
+      - revoked
+      - failed
+      title: CredentialStatus
+      type: string
+    CredentialType:
+      enum:
+      - course_completion
+      - skill_badge
+      - assessment_pass
+      title: CredentialType
+      type: string
+    CredentialVerifyResponse:
+      description: On-chain verification result for a credential.
+      properties:
+        course_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Course Id
+        credential_id:
+          format: uuid
+          title: Credential Id
+          type: string
+        credential_type:
+          anyOf:
+          - $ref: '#/components/schemas/CredentialType'
+          - type: 'null'
+        issued_at:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          title: Issued At
+        learner_wallet_address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Learner Wallet Address
+        on_chain_verified:
+          description: True when the tx receipt confirms the mint succeeded.
+          title: On Chain Verified
+          type: boolean
+        revoked_at:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          title: Revoked At
+        status:
+          $ref: '#/components/schemas/CredentialStatus'
+        tx_hash:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tx Hash
+      required:
+      - credential_id
+      - status
+      - on_chain_verified
+      title: CredentialVerifyResponse
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    LessonRead:
+      properties:
+        content_count:
+          default: 0
+          title: Content Count
+          type: integer
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        duration_minutes:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Duration Minutes
+        grade_level:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Grade Level
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_published:
+          default: false
+          title: Is Published
+          type: boolean
+        subject:
+          title: Subject
+          type: string
+        title:
+          maxLength: 512
+          minLength: 1
+          title: Title
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - title
+      - subject
+      - id
+      - created_at
+      - updated_at
+      title: LessonRead
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+info:
+  description: Content delivery and offline sync service for the Aku Platform. Provides
+    lesson catalogues, content sync for Edge Hubs, and blockchain credential issuance
+    via Polygon.
+  title: Akudemy
+  version: 0.1.0
+openapi: 3.1.0
+paths:
+  /api/v1/content:
+    post:
+      operationId: create_content_api_v1_content_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create or update a content item (admin)
+      tags:
+      - content
+  /api/v1/content/sync:
+    get:
+      description: Returns all content items updated since the given timestamp. Results
+        are served from a short-lived Redis cache to minimise latency for Edge Hub
+        polling.
+      operationId: sync_content_api_v1_content_sync_get
+      parameters:
+      - description: ISO-8601 timestamp; return items updated after this point.
+        example: '2024-01-01T00:00:00Z'
+        in: query
+        name: since
+        required: true
+        schema:
+          description: ISO-8601 timestamp; return items updated after this point.
+          format: date-time
+          title: Since
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentSyncResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Offline content sync (Edge Hub)
+      tags:
+      - content
+  /api/v1/content/{content_id}:
+    get:
+      operationId: get_content_api_v1_content__content_id__get
+      parameters:
+      - in: path
+        name: content_id
+        required: true
+        schema:
+          format: uuid
+          title: Content Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Fetch a single content item
+      tags:
+      - content
+  /api/v1/credentials/issue:
+    post:
+      description: Mints an on-chain credential NFT on the Polygon network. Returns
+        immediately with a PENDING status and the transaction hash; the caller should
+        poll /credentials/{id}/verify for confirmation.
+      operationId: issue_credential_api_v1_credentials_issue_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialIssueRequest'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialIssueResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Issue a blockchain credential via Polygon
+      tags:
+      - credentials
+  /api/v1/credentials/{credential_id}/verify:
+    get:
+      description: Checks the Polygon transaction receipt for the given credential
+        and returns the current on-chain verification status.
+      operationId: verify_credential_api_v1_credentials__credential_id__verify_get
+      parameters:
+      - in: path
+        name: credential_id
+        required: true
+        schema:
+          format: uuid
+          title: Credential Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialVerifyResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Verify an issued credential on-chain
+      tags:
+      - credentials
+  /api/v1/lessons:
+    get:
+      operationId: list_lessons_api_v1_lessons_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/LessonRead'
+                title: Response List Lessons Api V1 Lessons Get
+                type: array
+          description: Successful Response
+      summary: Lesson catalogue
+      tags:
+      - content
+  /health:
+    get:
+      operationId: health_health_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                title: Response Health Health Get
+                type: object
+          description: Successful Response
+      summary: Health
+      tags:
+      - ops

@@ -11,6 +11,7 @@ Usage (once the full file is in place):
   pip install -r requirements.txt
   python scripts/exam_paper_scraper.py --output data/exam_papers/
 """
+
 raise NotImplementedError(
     "Full scraper not yet migrated. See module docstring for migration instructions."
 )
