@@ -47,7 +47,7 @@ jobs:
         env:
           DATABASE_URL: postgresql+asyncpg://aku:aku@localhost:5432/aku_test
           JWT_SECRET_KEY: test-secret-key
-        run: pytest --cov=app --cov-report=xml -v
+        run: python -m pytest --cov=app --cov-report=xml -v
 
   docker:
     runs-on: ubuntu-latest
