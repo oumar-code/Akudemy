@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import os
 from datetime import datetime, timezone
+from typing import Annotated
 from uuid import UUID
 
 import redis.asyncio as aioredis
@@ -53,12 +54,14 @@ async def get_redis() -> aioredis.Redis | None:  # pragma: no cover
     ),
 )
 async def sync_content(
-    since: datetime = Query(
-        default=...,
-        description="ISO-8601 timestamp; return items updated after this point.",
-        example="2024-01-01T00:00:00Z",
-    ),
-    redis: aioredis.Redis | None = Depends(get_redis),
+    since: Annotated[
+        datetime,
+        Query(
+            description="ISO-8601 timestamp; return items updated after this point.",
+            example="2024-01-01T00:00:00Z",
+        ),
+    ],
+    redis: Annotated[aioredis.Redis | None, Depends(get_redis)],
 ) -> ContentSyncResponse:
     since_utc = since.replace(tzinfo=timezone.utc) if since.tzinfo is None else since
     return await content_svc.get_sync_delta(since=since_utc, redis_client=redis)
