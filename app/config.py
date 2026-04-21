@@ -1,31 +1,35 @@
+"""Akudemy application settings."""
+
+from __future__ import annotations
+
+from functools import lru_cache
+
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
-    service_name: str = "akudemy"
-    version: str = "0.1.0"
-    environment: str = "development"
-    debug: bool = False
-
-    # Database
-    database_url: str = "postgresql+asyncpg://aku:aku@localhost:5432/aku_db"
+    app_name: str = "Akudemy"
+    log_level: str = "info"
 
     # Redis
-    redis_url: str = "redis://localhost:6379/0"
+    redis_url: str = Field("redis://redis:6379", alias="REDIS_URL")
 
-    # JWT
-    jwt_secret_key: str = "change-me-in-production"
-    jwt_algorithm: str = "HS256"
-    jwt_access_token_expire_minutes: int = 60
-
-    # Service discovery
-    aku_ai_url: str = "http://localhost:3001"
-    aku_ighub_url: str = "http://localhost:3002"
-
-    # Kafka
-    kafka_bootstrap_servers: str = "localhost:9092"
+    # Polygon / blockchain
+    polygon_rpc_url: str = Field("https://polygon-rpc.com", alias="POLYGON_RPC_URL")
+    polygon_network: str = Field("amoy", alias="POLYGON_NETWORK")
 
 
-settings = Settings()
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+
+
+settings = get_settings()
